@@ -1,0 +1,4 @@
+#formatter.name: pretty
+suites:
+    acme_suite:
+        namespace: App
