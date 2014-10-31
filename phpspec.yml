@@ -2,3 +2,4 @@
 suites:
     acme_suite:
         namespace: App
+    src_path: src
