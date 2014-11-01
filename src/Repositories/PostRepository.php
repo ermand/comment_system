@@ -8,16 +8,32 @@ class PostRepository extends BaseRepository {
     private static $tableName = 'posts';
     private static $modelClass = 'App\Models\Post';
 
+    /**
+     * Get table name.
+     *
+     * @return string
+     */
     protected function getTableName()
     {
         return self::$tableName;
     }
 
+    /**
+     * Get class of model.
+     *
+     * @return string
+     */
     protected function getModelClass()
     {
         return self::$modelClass;
     }
 
+    /**
+     * Save object to database.
+     *
+     * @param Post $post
+     * @return bool
+     */
     public function save(Post $post)
     {
         // If the ID is set, we're updating an existing record
@@ -39,25 +55,4 @@ class PostRepository extends BaseRepository {
         return $stmt->execute();
     }
 
-    public function update(Post $post)
-    {
-        if (!isset($post->id)) {
-            // We can't update a record unless it exists...
-            throw new \LogicException(
-                'Cannot update post that does not yet exist in the database.'
-            );
-        }
-        $stmt = $this->connection->prepare('
-            UPDATE ' . self::$tableName . '
-            SET name = :name,
-                email = :email,
-                message = :message
-            WHERE id = :id
-        ');
-        $stmt->bindParam(':name', $post->name);
-        $stmt->bindParam(':email', $post->email);
-        $stmt->bindParam(':message', $post->message);
-        $stmt->bindParam(':id', $post->id);
-        return $stmt->execute();
-    }
 } 

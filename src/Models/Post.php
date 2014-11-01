@@ -1,7 +1,7 @@
 <?php namespace App\Models;
 
 use App\Repository\PostRepository;
-use App\Validator;
+use App\Services\Validator;
 use DateTime;
 
 class Post {
@@ -24,28 +24,40 @@ class Post {
         'message' => 'minLength[10]'
     ];
 
+    /**
+     * @param PostRepository $postRepository
+     */
     public function __construct(PostRepository $postRepository = null)
     {
         $this->postRepository = ($postRepository === null) ? new PostRepository() : $postRepository;
     }
 
+    /**
+     * Initialize post object.
+     *
+     * @param array $postData
+     * @return $this
+     */
     public function init(array $postData)
     {
         foreach ($postData as $field => $value)
         {
-//            $data = [
-//                'field' => $field,
-//                'value' => $value
-//            ];
-//
-//            $validator = new Validator();
-//            $validator->validate($data, $this->rules);
-//            if ($validator->fails)
-//            {
-//                $this->hasError = true;
-//                $this->errors[] = $validator->errors;
-//            }
+            //Validate input data based on rules.
+            $data = [
+                'field' => $field,
+                'value' => $value
+            ];
 
+            $validator = new Validator();
+
+            $validator->validate($data, $this->rules);
+            if ($validator->fails)
+            {
+                $this->hasError = true;
+                $this->errors[] = $validator->errors;
+            }
+
+            // Set object properties.
             $this->setProperty($value, $field);
             $this->created_at = new DateTime();
         }
@@ -54,6 +66,8 @@ class Post {
     }
 
     /**
+     * Return has error parameter.
+     *
      * @return boolean
      */
     public function isHasError()
@@ -62,6 +76,8 @@ class Post {
     }
 
     /**
+     * Set has error.
+     *
      * @param boolean $hasError
      */
     public function setHasError($hasError)
@@ -69,47 +85,33 @@ class Post {
         $this->hasError = $hasError;
     }
 
+    /**
+     * Create new post.
+     *
+     * @param array $postData
+     * @return Post|array|bool
+     */
     public function create(array $postData)
     {
         $post = $this->init($postData);
 
+        // If there are errors return them.
+        if ($post->hasError())
+        {
+            return $post->getErrors();
+        }
+
+        // Otherwise save post.
         $post = $this->postRepository->save($post);
 
-
         return $post;
-
-//        $sql = "INSERT INTO " . self::$tableName . " (";
-//        $sql .= join(", ", array_keys($postData));
-//        $sql .= ") VALUES ('";
-//        $sql .= join("', '", array_values($postData));
-//        $sql .= "')";
-//
-//        $database->query($sql);
-//        $database->execute();
-//        echo $database->lastInsertId();
-
-//        foreach ($postData as $field => $value)
-//        {
-//            $data = [
-//                'field' => $field,
-//                'value' => $value
-//            ];
-//
-//            $validator = new Validator();
-//            $validator->validate($data, $this->rules);
-//            if ($validator->fails)
-//            {
-//                $this->hasError = true;
-//                $this->errors[] = $validator->errors;
-//            }
-//
-//            $this->setProperty($value, $field);
-//            $this->created_at = new DateTime();
-//        }
-//
-//        return $this;
     }
 
+    /**
+     * Get all posts.
+     *
+     * @return array
+     */
     public static function all()
     {
         $post = new self;
@@ -117,6 +119,12 @@ class Post {
         return $post->postRepository->findAll();
     }
 
+    /**
+     * Find post by id.
+     *
+     * @param $id
+     * @return mixed
+     */
     public static function find($id)
     {
         $post = new self;
@@ -124,6 +132,12 @@ class Post {
         return $post->postRepository->find($id);
     }
 
+    /**
+     * Find post by name.
+     *
+     * @param $name
+     * @return array
+     */
     public static function whereName($name)
     {
         $post = new self;
@@ -131,6 +145,12 @@ class Post {
         return $post->postRepository->findByColumn('name', $name);
     }
 
+    /**
+     * Find post by email.
+     *
+     * @param $name
+     * @return array
+     */
     public static function whereEmail($name)
     {
         $post = new self;
@@ -138,27 +158,26 @@ class Post {
         return $post->postRepository->findByColumn('name', $name);
     }
 
-    public static function where($column, $value, $operator = '=')
+    /**
+     * Find comment based on column, value and operator.
+     *
+     * @param $column
+     * @param $value
+     * @param null $operator
+     * @param null $orderByColumn
+     * @param null $orderBy
+     * @return array
+     */
+    public static function where($column, $value, $operator = NULL, $orderByColumn = NULL, $orderBy = NULL)
     {
         $post = new self;
 
-        return $post->postRepository->findByColumn($column, $value, $operator);
-    }
-
-    public function update()
-    {
-        return $this->postRepository->update($this);
+        return $post->postRepository->findByColumn($column, $value, $operator, $orderByColumn, $orderBy);
     }
 
     /**
-     * @return int
-     */
-    public function count()
-    {
-        return count($this->id);
-    }
-
-    /**
+     * Set object property.
+     *
      * @param $value
      * @param $field
      * @return mixed

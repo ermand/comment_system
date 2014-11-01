@@ -1,4 +1,4 @@
-<?php namespace App;
+<?php namespace App\Services;
 
 use InvalidArgumentException;
 
@@ -77,6 +77,7 @@ class Validator {
 
     /**
      * Check if input has max length.
+     *
      * @param $input
      * @param $value
      * @param $field
@@ -117,6 +118,8 @@ class Validator {
     }
 
     /**
+     * Throw exception if method is missing.
+     *
      * @param $methodName
      * @throws InvalidArgumentException
      */
@@ -128,17 +131,17 @@ class Validator {
     }
 
     /**
+     * Get text between brackets.
+     *
      * @param $string
      * @return mixed
      */
     private function getTextBetweenBrackets($string)
     {
-//        var_dump($string);
         preg_match("^\[(.*?)\]^", $string, $matches);
 
         if (isset($matches) && ! empty($matches))
         {
-//            var_dump($matches);
             return $matches[1];
         }
         else
@@ -148,6 +151,8 @@ class Validator {
     }
 
     /**
+     * Check if there are many rules per value.
+     *
      * @param $ruleValues
      * @return bool
      */
@@ -157,6 +162,8 @@ class Validator {
     }
 
     /**
+     * Get method name from rule field.
+     *
      * @param $fieldRule
      * @return mixed
      */
@@ -166,6 +173,8 @@ class Validator {
     }
 
     /**
+     * Convert rules to array by delimeter '|' .
+     *
      * @param $rule
      * @return array
      */
@@ -175,6 +184,7 @@ class Validator {
     }
 
     /**
+     * Get all rule values by delimeter ',' .
      * @param $ruleValues
      * @return array
      */
@@ -184,6 +194,8 @@ class Validator {
     }
 
     /**
+     * Call all rules per field.
+     *
      * @param array $fieldRules
      * @param $value
      * @param $ruleField
@@ -198,6 +210,7 @@ class Validator {
             // Check if there are more than one value per rule.
             $ruleValues = $this->hasManyRuleValues($ruleValues) ? $this->getAllRuleValues($ruleValues) : $ruleValues;
 
+            // If metthod exists then call it, otherwise throw missing method exception.
             method_exists($this, $methodName)
                 ? call_user_func_array([$this, $methodName], [$value, $ruleValues, $ruleField])
                 : $this->throwExpectionForMissingMethod($methodName);

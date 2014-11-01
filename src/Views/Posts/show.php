@@ -2,7 +2,8 @@
 
 <?php ob_start() ?>
     <div class="jumbotron">
-        <section id="content" class="body">
+        <!-- Post content-->
+        <section id="content" class="body well">
 
             <article class="hentry">
                 <header>
@@ -10,17 +11,17 @@
                 </header>
 
                 <footer class="post-info">
-                    <abbr class="published" title="2012-02-10T14:07:00-07:00">
-                        <?php echo $post->created_at ?>
+                    <abbr class="published" title="<?php echo($post->created_at); ?>">
+                        <?php echo(date('d F Y', strtotime($post->created_at))); ?>
                     </abbr>
 
                     <address class="vcard author">
-                        By <?php echo $post->name ?>
+                        By <a class="url fn" href="#"><?php echo($post->name); ?></a>
                     </address>
                 </footer>
 
                 <div class="entry-content">
-                    <p><?php echo $post->message ?></p>
+                    <p><?php echo plainUrlToLink($post->message); ?></p>
                 </div>
             </article>
 
@@ -33,25 +34,12 @@
             <header>
                 <h2>Comments</h2>
             </header>
+            <?php include 'src/Views/Comments/list.php'; ?>
 
-            <ol id="posts-list" class="hfeed">
-                <li>
-                    <article id="comment_1" class="hentry">
-                        <footer class="post-info">
-                            <abbr class="published" title="Thu, 23 Feb 2012 23:54:46 +0000">
-                                23 February 2012
-                            </abbr>
-
-                            <address class="vcard author">
-                                By <a class="url fn" href="#">Phil Leggetter</a>
-                            </address>
-                        </footer>
-                    </article>
-                </li>
-            </ol>
+            <input type="hidden" name="post_id" value="<?php echo $post->id ?>" id="post_id"/>
 
             <div id="respond">
-                <?php require 'src/Views/Comments/create.php'; ?>
+                <?php include 'src/Views/Comments/create.php'; ?>
             </div>
         </section>
 
