@@ -9,7 +9,7 @@
 This projects uses composer for autoloading and psr-4.
 
 - Step 1:
-    Extract zip file and move it into web server's root folder. Example: Apache's root folder is wwww.
+    Extract zip file and move it into web server's root folder. Example: Apache's root folder is www.
 
 - Step 2:
     Open terminal on extracted folder and run: composer install or composer update.
